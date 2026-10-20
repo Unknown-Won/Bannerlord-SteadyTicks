@@ -93,19 +93,26 @@
     <Delete Files="$(DistFolder)\bin\Win64_Shipping_Client\SteadyTicks.pdb" />
   </Target>
 
-  <!-- Release builds also produce dist\SteadyTicks-<version>.zip (a SteadyTicks folder ready for Nexus or manual install). -->
+  <!-- Release builds also produce dist\SteadyTicks-<version>.7z (a SteadyTicks folder ready for Nexus or manual install). Needs 7-Zip. -->
+  <PropertyGroup>
+    <SevenZip Condition="'$(SevenZip)' == ''">$(registry:HKEY_LOCAL_MACHINE\SOFTWARE\7-Zip@Path)7z.exe</SevenZip>
+    <SevenZip Condition="!Exists('$(SevenZip)')">C:\Program Files\7-Zip\7z.exe</SevenZip>
+  </PropertyGroup>
   <Target Name="PackageModule" AfterTargets="StageModule" Condition="$(Configuration.Contains('Release'))">
     <PropertyGroup>
       <PackageRoot>$(MSBuildProjectDirectory)\..\dist\package</PackageRoot>
       <PackageVersion>$([System.Version]::Parse('$(Version)').ToString(3))</PackageVersion>
+      <PackageFile>$(MSBuildProjectDirectory)\..\dist\$(ModuleName)-$(PackageVersion).7z</PackageFile>
     </PropertyGroup>
     <ItemGroup>
       <StagedFiles Include="$(DistFolder)\**\*" />
     </ItemGroup>
-    <RemoveDir Directories="$(PackageRoot)" />
-    <Copy SourceFiles="@(StagedFiles)" DestinationFolder="$(PackageRoot)\$(ModuleName)\%(RecursiveDir)" />
-    <ZipDirectory SourceDirectory="$(PackageRoot)" DestinationFile="$(MSBuildProjectDirectory)\..\dist\$(ModuleName)-$(PackageVersion).zip" Overwrite="true" />
-    <RemoveDir Directories="$(PackageRoot)" />
+    <Warning Condition="!Exists('$(SevenZip)')" Text="7-Zip not found, so no .7z package was made. Install 7-Zip or set SevenZip in SteadyTicks.local.props." />
+    <RemoveDir Directories="$(PackageRoot)" Condition="Exists('$(SevenZip)')" />
+    <Copy SourceFiles="@(StagedFiles)" DestinationFolder="$(PackageRoot)\$(ModuleName)\%(RecursiveDir)" Condition="Exists('$(SevenZip)')" />
+    <Delete Files="$(PackageFile)" Condition="Exists('$(SevenZip)')" />
+    <Exec Command="&quot;$(SevenZip)&quot; a -t7z -mx=9 &quot;$(PackageFile)&quot; &quot;$(ModuleName)&quot;" WorkingDirectory="$(PackageRoot)" StandardOutputImportance="low" Condition="Exists('$(SevenZip)')" />
+    <RemoveDir Directories="$(PackageRoot)" Condition="Exists('$(SevenZip)')" />
   </Target>
 
   <!--

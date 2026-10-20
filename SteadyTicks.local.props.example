@@ -4,6 +4,7 @@
   GameFolder: game install used for references (or set BANNERLORD_GAME_DIR instead).
   HarmonyFolder / McmFolder: where Bannerlord.Harmony and MCM keep their DLLs, if not under GameFolder\Modules.
   InstalledGameFolder: the real game install, used by tools\PatchCheck.
+  SevenZip: optional; path to 7z.exe if 7-Zip is not found automatically (Release builds package a .7z).
   ModsDeployFolder: optional; builds run with -p:DeployToMods=true also copy the module there (for example your mod manager's folder).
   -->
   <PropertyGroup>
