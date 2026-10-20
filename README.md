@@ -16,7 +16,9 @@ Steady Ticks never patches other mods. It works on the game's own event lists, s
 
 ## What to expect
 
-The gain depends on your mod list. In a heavily modded campaign (about 2,200 parties, 30+ mods with tick listeners), average FPS at fast forward went up by a few percent, and the frame on the hour and at midnight no longer stacks every listener at once. A single listener that is slow on its own still takes as long in its own frame: Steady Ticks moves work, it never skips or splits it.
+The gain depends on your mod list. In a heavily modded campaign (about 2,200 parties, 30+ mods with tick listeners), CapFrameX measured +2.6% average FPS, +15% 1% percentile FPS and +66% 0.2% percentile FPS (3 runs of 90 seconds each, same save): the frames on the hour and at midnight no longer stack every listener at once.
+
+![CapFrameX comparison](docs/capframex.png) A single listener that is slow on its own still takes as long in its own frame: Steady Ticks moves work, it never skips or splits it.
 
 ## Requirements
 
