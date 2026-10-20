@@ -16,11 +16,16 @@ Steady Ticks never patches other mods. It works on the game's own event lists, s
 
 ## What to expect
 
-The gain depends on your mod list. In a heavily modded campaign (about 2,200 parties, 30+ mods with tick listeners), CapFrameX measured +2.6% average FPS, +15% 1% percentile FPS and +66% 0.2% percentile FPS (3 runs of 90 seconds each, same save): the frames on the hour and at midnight no longer stack every listener at once.
+The gain depends on your mod list. In a heavily modded campaign (about 2,200 parties, 30+ mods with tick listeners), CapFrameX measured over 3 runs of 90 seconds each on the same save: average FPS +2.7%, 1% percentile FPS +14% (30.0 to 34.3), 0.2% percentile FPS about doubled (10.0 to 19.9), and 38% fewer frames slower than 100 ms (63 to 39). The frames on the hour and at midnight no longer stack every listener at once.
 
 A single listener that is slow on its own still takes as long in its own frame: Steady Ticks moves work, it never skips or splits it.
 
-![CapFrameX comparison](docs/capframex.png)
+![FPS: average and lows](docs/images/1-summary.png)
+![Stutters](docs/images/2-stutters.png)
+![Frame times](docs/images/3-frametimes.png)
+![The slowest frames](docs/images/4-percentiles.png)
+
+The charts are made from CapFrameX captures with `tools/charts` (see Building).
 
 ## Requirements
 
@@ -76,6 +81,13 @@ Requires Visual Studio 2022 (or the .NET SDK with MSBuild) and a Bannerlord inst
    MSBuild tools\PatchCheck\PatchCheck.csproj -restore
    tools\PatchCheck\bin\Debug\net472\PatchCheck.exe
    ```
+
+4. Optional charts: export two CapFrameX captures (with and without the mod) as JSON, then
+   ```
+   node tools\charts\capframex-charts.js with.json without.json <outDir>
+   powershell -File tools\charts\render.ps1 -Dir <outDir>
+   ```
+   The first writes the charts as HTML, the second turns them into PNG with headless Chrome.
 
 ## License
 
