@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Module>
+  <Name value="Steady Ticks"/>
+  <Id value="SteadyTicks"/>
+  <Version value="v1.0.0"/>
+  <SingleplayerModule value="true"/>
+  <MultiplayerModule value="false"/>
+  <Official value="false"/>
+  <DefaultModule value="false"/>
+  <ModuleCategory value="Singleplayer"/>
+  <ModuleType value="Community"/>
+  <DependedModules>
+    <DependedModule Id="Bannerlord.Harmony" DependentVersion="v2.4.2"/>
+    <DependedModule Id="Bannerlord.MBOptionScreen" DependentVersion="v5.12.0"/>
+    <DependedModule Id="Native"/>
+    <DependedModule Id="SandBoxCore"/>
+    <DependedModule Id="Sandbox"/>
+  </DependedModules>
+  <DependedModuleMetadatas>
+    <DependedModuleMetadata id="Bannerlord.Harmony" order="LoadBeforeThis" version="v2.4.2"/>
+    <DependedModuleMetadata id="Bannerlord.MBOptionScreen" order="LoadBeforeThis" version="v5.12.0"/>
+    <DependedModuleMetadata id="Native" order="LoadBeforeThis" version="1.0.0.*"/>
+    <DependedModuleMetadata id="SandBoxCore" order="LoadBeforeThis" version="1.0.0.*"/>
+    <DependedModuleMetadata id="Sandbox" order="LoadBeforeThis" version="1.0.0.*"/>
+    <DependedModuleMetadata id="StoryMode" order="LoadBeforeThis" version="1.0.0.*" optional="true"/>
+    <DependedModuleMetadata id="NavalDLC" order="LoadBeforeThis" version="1.0.0.*" optional="true"/>
+  </DependedModuleMetadatas>
+  <SubModules>
+    <SubModule>
+      <Name value="SteadyTicks"/>
+      <DLLName value="SteadyTicks.dll"/>
+      <SubModuleClassType value="SteadyTicks.SubModule"/>
+      <Tags/>
+    </SubModule>
+  </SubModules>
+  <Xmls/>
+</Module>

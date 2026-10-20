@@ -1,0 +1,122 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Version>1.0.0.0</Version>
+    <ModuleName>SteadyTicks</ModuleName>
+    <TargetFramework>net472</TargetFramework>
+    <Platforms>x64</Platforms>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <Configurations>Stable_Debug;Stable_Release;Beta_Debug;Beta_Release</Configurations>
+    <RootNamespace>SteadyTicks</RootNamespace>
+    <AssemblyName>SteadyTicks</AssemblyName>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <BuildResourcesVersion>1.1.0.129</BuildResourcesVersion>
+    <MCMVersion>5.12.0</MCMVersion>
+    <GameVersion>1.4.8</GameVersion>
+  </PropertyGroup>
+
+  <!--
+  Game folder used for references: BANNERLORD_GAME_DIR, or the paths in ..\SteadyTicks.local.props (copy the .example),
+  or the default Steam folder. Nothing is ever copied into the game folder: the build only fills dist\SteadyTicks in this repo.
+  -->
+  <Import Project="..\SteadyTicks.local.props" Condition="Exists('..\SteadyTicks.local.props')" />
+  <PropertyGroup>
+    <GameFolder Condition="'$(BANNERLORD_GAME_DIR)' != ''">$(BANNERLORD_GAME_DIR)</GameFolder>
+    <GameFolder Condition="'$(GameFolder)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord</GameFolder>
+    <HarmonyFolder Condition="Exists('$(GameFolder)\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client')">$(GameFolder)\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client</HarmonyFolder>
+    <DistFolder>$(MSBuildProjectDirectory)\..\dist\$(ModuleName)</DistFolder>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GameVersionConstant>e$([System.String]::Copy('$(GameVersion)').Replace('.',''))</GameVersionConstant>
+    <DefineConstants>$(DefineConstants);$(GameVersionConstant);MCM_v5</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Bannerlord.BuildResources" Version="$(BuildResourcesVersion)">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Bannerlord.MCM" Version="$(MCMVersion)" />
+    <PackageReference Include="IsExternalInit" Version="1.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Nullable" Version="1.3.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.*.dll" Exclude="$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.Native.dll">
+      <HintPath>%(Identity)</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="$(GameFolder)\Modules\Native\bin\Win64_Shipping_Client\*.dll">
+      <HintPath>%(Identity)</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="$(GameFolder)\Modules\SandBox\bin\Win64_Shipping_Client\*.dll">
+      <HintPath>%(Identity)</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="$(GameFolder)\Modules\SandBoxCore\bin\Win64_Shipping_Client\*.dll">
+      <HintPath>%(Identity)</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="$(HarmonyFolder)\0Harmony.dll">
+      <HintPath>%(Identity)</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="_Module\**" />
+  </ItemGroup>
+
+  <!-- Ready-to-install module folder inside the repo (dist\SteadyTicks). Never copies into the game. -->
+  <Target Name="StageModule" AfterTargets="Build">
+    <ItemGroup>
+      <ModuleFiles Include="$(MSBuildProjectDirectory)\_Module\**\*" />
+      <ModuleBinaries Include="$(TargetDir)SteadyTicks.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ModuleFiles)" DestinationFolder="$(DistFolder)\%(RecursiveDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(ModuleBinaries)" DestinationFolder="$(DistFolder)\bin\Win64_Shipping_Client" SkipUnchangedFiles="true" />
+    <!-- Only what the game needs: no debug symbols (removes any left by older builds). -->
+    <Delete Files="$(DistFolder)\bin\Win64_Shipping_Client\SteadyTicks.pdb" />
+  </Target>
+
+  <!-- Release builds also produce dist\SteadyTicks-<version>.zip (a SteadyTicks folder ready for Nexus or manual install). -->
+  <Target Name="PackageModule" AfterTargets="StageModule" Condition="$(Configuration.Contains('Release'))">
+    <PropertyGroup>
+      <PackageRoot>$(MSBuildProjectDirectory)\..\dist\package</PackageRoot>
+      <PackageVersion>$([System.Version]::Parse('$(Version)').ToString(3))</PackageVersion>
+    </PropertyGroup>
+    <ItemGroup>
+      <StagedFiles Include="$(DistFolder)\**\*" />
+    </ItemGroup>
+    <RemoveDir Directories="$(PackageRoot)" />
+    <Copy SourceFiles="@(StagedFiles)" DestinationFolder="$(PackageRoot)\$(ModuleName)\%(RecursiveDir)" />
+    <ZipDirectory SourceDirectory="$(PackageRoot)" DestinationFile="$(MSBuildProjectDirectory)\..\dist\$(ModuleName)-$(PackageVersion).zip" Overwrite="true" />
+    <RemoveDir Directories="$(PackageRoot)" />
+  </Target>
+
+  <!--
+  Optional deploy to a mod manager folder, set as ModsDeployFolder in ..\SteadyTicks.local.props. Skipped when unset or
+  missing; turn off with -p:DeployToMods=false. Never the game's Modules folder.
+  -->
+  <Target Name="DeployToMods" AfterTargets="StageModule" Condition="'$(DeployToMods)' != 'false' AND '$(ModsDeployFolder)' != '' AND Exists('$(ModsDeployFolder)')">
+    <ItemGroup>
+      <DistFiles Include="$(DistFolder)\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(DistFiles)" DestinationFolder="$(ModsDeployFolder)\%(RecursiveDir)" SkipUnchangedFiles="true" />
+    <Delete Files="$(ModsDeployFolder)\bin\Win64_Shipping_Client\SteadyTicks.pdb" />
+    <Message Importance="high" Text="Deployed to $(ModsDeployFolder)" />
+  </Target>
+
+</Project>

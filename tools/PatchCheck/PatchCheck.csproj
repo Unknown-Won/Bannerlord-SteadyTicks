@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Paths come from ..\..\SteadyTicks.local.props (copy the .example) or the default Steam folder. -->
+  <Import Project="..\..\SteadyTicks.local.props" Condition="Exists('..\..\SteadyTicks.local.props')" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>9.0</LangVersion>
+    <InstalledGameFolder Condition="'$(InstalledGameFolder)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord</InstalledGameFolder>
+    <HarmonyFolder Condition="'$(HarmonyFolder)' == ''">$(InstalledGameFolder)\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client</HarmonyFolder>
+    <McmFolder Condition="'$(McmFolder)' == ''">$(InstalledGameFolder)\Modules\Bannerlord.MBOptionScreen\bin\Win64_Shipping_Client</McmFolder>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony"><HintPath>$(HarmonyFolder)\0Harmony.dll</HintPath></Reference>
+    <!-- The paths the checker searches for game, Harmony and MCM assemblies at run time. -->
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>GameFolder</_Parameter1>
+      <_Parameter2>$(InstalledGameFolder)</_Parameter2>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>HarmonyFolder</_Parameter1>
+      <_Parameter2>$(HarmonyFolder)</_Parameter2>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>McmFolder</_Parameter1>
+      <_Parameter2>$(McmFolder)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+</Project>
