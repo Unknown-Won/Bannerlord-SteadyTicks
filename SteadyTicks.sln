@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteadyTicks", "src\SteadyTicks.csproj", "{C76A8F43-D9C0-4994-9E0F-4BCB93E59360}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{5B0E9C1A-3F6D-4E8B-9A2C-7D1E4F6A8B3C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatchCheck", "tools\PatchCheck\PatchCheck.csproj", "{23A742D0-4748-4AFE-B408-B170CF184FD3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Stable_Debug|x64 = Stable_Debug|x64
+		Stable_Release|x64 = Stable_Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C76A8F43-D9C0-4994-9E0F-4BCB93E59360}.Stable_Debug|x64.ActiveCfg = Stable_Debug|x64
+		{C76A8F43-D9C0-4994-9E0F-4BCB93E59360}.Stable_Debug|x64.Build.0 = Stable_Debug|x64
+		{C76A8F43-D9C0-4994-9E0F-4BCB93E59360}.Stable_Release|x64.ActiveCfg = Stable_Release|x64
+		{C76A8F43-D9C0-4994-9E0F-4BCB93E59360}.Stable_Release|x64.Build.0 = Stable_Release|x64
+		{23A742D0-4748-4AFE-B408-B170CF184FD3}.Stable_Debug|x64.ActiveCfg = Debug|Any CPU
+		{23A742D0-4748-4AFE-B408-B170CF184FD3}.Stable_Release|x64.ActiveCfg = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{23A742D0-4748-4AFE-B408-B170CF184FD3} = {5B0E9C1A-3F6D-4E8B-9A2C-7D1E4F6A8B3C}
+	EndGlobalSection
+EndGlobal

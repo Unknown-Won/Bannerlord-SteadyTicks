@@ -4,7 +4,7 @@
   GameFolder: game install used for references (or set BANNERLORD_GAME_DIR instead).
   HarmonyFolder / McmFolder: where Bannerlord.Harmony and MCM keep their DLLs, if not under GameFolder\Modules.
   InstalledGameFolder: the real game install, used by tools\PatchCheck.
-  ModsDeployFolder: optional; if set, every build also copies the module there (for example your mod manager's folder).
+  ModsDeployFolder: optional; builds run with -p:DeployToMods=true also copy the module there (for example your mod manager's folder).
   -->
   <PropertyGroup>
     <GameFolder Condition="'$(BANNERLORD_GAME_DIR)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord</GameFolder>

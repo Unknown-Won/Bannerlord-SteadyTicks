@@ -71,11 +71,11 @@ Turning the profiler on causes a short pause while it sets up timing for every l
 Requires Visual Studio 2022 (or the .NET SDK with MSBuild) and a Bannerlord install.
 
 1. Copy `SteadyTicks.local.props.example` to `SteadyTicks.local.props` and set your paths (or set `BANNERLORD_GAME_DIR`).
-2. Build:
+2. Build: open `SteadyTicks.sln` in Visual Studio and build **Stable_Release | x64**, or from a command line:
    ```
-   MSBuild src\SteadyTicks.csproj -restore -p:Configuration=Stable_Release -p:Platform=x64
+   MSBuild SteadyTicks.sln -restore -p:Configuration=Stable_Release -p:Platform=x64
    ```
-   The build fills `dist\SteadyTicks` with a ready-to-install module. It never writes into the game folder. If `ModsDeployFolder` is set in the local props, it also copies the module there.
+   The build fills `dist\SteadyTicks` with a ready-to-install module and, for Release, makes `dist\SteadyTicks-<version>.zip`. It never writes into the game folder or your mod manager. To also copy the module to `ModsDeployFolder` from the local props, add `-p:DeployToMods=true`.
 3. Optional offline check: `tools\PatchCheck` applies every patch against the installed game and tests the spreading order.
    ```
    MSBuild tools\PatchCheck\PatchCheck.csproj -restore

@@ -28,6 +28,8 @@
     <GameFolder Condition="'$(BANNERLORD_GAME_DIR)' != ''">$(BANNERLORD_GAME_DIR)</GameFolder>
     <GameFolder Condition="'$(GameFolder)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord</GameFolder>
     <HarmonyFolder Condition="Exists('$(GameFolder)\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client')">$(GameFolder)\Modules\Bannerlord.Harmony\bin\Win64_Shipping_Client</HarmonyFolder>
+    <!-- Bannerlord.BuildResources warns when its environment variables are unset; the game folder above is all it needs. -->
+    <BANNERLORD_GAME_DIR Condition="'$(BANNERLORD_GAME_DIR)' == ''">$(GameFolder)</BANNERLORD_GAME_DIR>
     <DistFolder>$(MSBuildProjectDirectory)\..\dist\$(ModuleName)</DistFolder>
   </PropertyGroup>
 
@@ -107,10 +109,10 @@
   </Target>
 
   <!--
-  Optional deploy to a mod manager folder, set as ModsDeployFolder in ..\SteadyTicks.local.props. Skipped when unset or
-  missing; turn off with -p:DeployToMods=false. Never the game's Modules folder.
+  Optional deploy to a mod manager folder, set as ModsDeployFolder in ..\SteadyTicks.local.props. Only runs when asked for with
+  -p:DeployToMods=true (normal builds, including from Visual Studio, never deploy). Never the game's Modules folder.
   -->
-  <Target Name="DeployToMods" AfterTargets="StageModule" Condition="'$(DeployToMods)' != 'false' AND '$(ModsDeployFolder)' != '' AND Exists('$(ModsDeployFolder)')">
+  <Target Name="DeployToMods" AfterTargets="StageModule" Condition="'$(DeployToMods)' == 'true' AND '$(ModsDeployFolder)' != '' AND Exists('$(ModsDeployFolder)')">
     <ItemGroup>
       <DistFiles Include="$(DistFolder)\**\*" />
     </ItemGroup>
