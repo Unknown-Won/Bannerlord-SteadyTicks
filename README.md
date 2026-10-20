@@ -1,6 +1,6 @@
 # Steady Ticks
 
-Smoother campaign map performance for Mount & Blade II: Bannerlord, without changing how fast time passes. Quests, calendars, the economy and other mods' timers behave exactly as in vanilla.
+Fewer campaign map stutters for Mount & Blade II: Bannerlord.
 
 ## What it does
 
