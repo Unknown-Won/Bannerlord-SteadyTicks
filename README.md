@@ -8,7 +8,7 @@ Bannerlord already spreads most per-party, per-settlement and per-hero work acro
 
 - **Spread ticks.** When the hourly, daily or weekly tick fires, Steady Ticks queues its listeners (the game's and, by default, other mods') in their original order and runs them over the following frames within a small time budget. Every listener still runs exactly once per tick, within the same in-game hour, and anything left is finished before the next hour and before a save.
 - **Learned scheduling.** It measures how long each listener takes while you play. A heavy listener gets a frame to itself and light ones are packed together. If the queue would not finish before the next in-game hour, the budget grows to make it.
-- **Hero healing.** Heroes outside a party heal every 4 hours by 4 hours' worth instead of every hour. Healing per day is unchanged.
+- **Hero healing.** Heroes outside a party heal every 4 hours instead of every hour, by the time they spent outside a party since the last heal. Healing per day is unchanged, also for heroes who join or leave a party in between.
 - **Slow down distant AI (optional, off by default).** Parties far outside your sight rethink their plans every 12 hours instead of 6. Nearby parties, armies, battles, sieges and forced rethinks are never slowed.
 - **Profiler (optional, off by default).** Measures FPS and where campaign map time goes: every listener of every campaign event from the game and every mod, per-mod totals, battles, encounters, world size and memory over time. Useful for finding which mod slows a long campaign down.
 

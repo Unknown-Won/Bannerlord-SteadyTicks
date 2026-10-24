@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Hero healing: a hero who joins or leaves a party between two 4-hour heals now gets exactly the hours spent outside a party, instead of all or nothing.
+
 ## 1.0.0
 
 First public release.
