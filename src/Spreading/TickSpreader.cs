@@ -31,21 +31,20 @@ namespace SteadyTicks.Spreading
         {
             public readonly int Frame;
             public readonly Action Action;
-            public readonly Type? Owner;
-            public readonly string Event;
+            public readonly object Record;
 
-            public Item(int frame, Action action, Type? owner, string eventName)
+            public Item(int frame, Action action, object record)
             {
                 Frame = frame;
                 Action = action;
-                Owner = owner;
-                Event = eventName;
+                Record = record;
             }
         }
 
         private static readonly Queue<Item> Pending = new();
         private static readonly Dictionary<Assembly, bool> BaseGameAssemblies = new();
         private static readonly bool[] SplitLogged = new bool[3];
+        private static readonly MbEvent?[] SpreadEvents = new MbEvent?[3];
 
         private static FieldInfo? _listField, _nextField;
         private static PropertyInfo? _actionProperty, _ownerProperty;
@@ -74,6 +73,10 @@ namespace SteadyTicks.Spreading
                 prefix: Patching.Own(self, nameof(DrainPrefix)), prefixPriority: Priority.VeryHigh);
             Patching.Apply(harmony, "Spread.FlushBeforeSave", AccessTools.Method(typeof(SaveHandler), "SaveTick", Type.EmptyTypes),
                 prefix: Patching.Own(self, nameof(SaveTickPrefix)));
+            // An object that is done (a mod's quest, a behavior) removes its listeners. The game then never calls them again, so neither may the queue.
+            // Patched on the private worker: the public ClearListeners is a one-line call the JIT may inline.
+            Patching.Apply(harmony, "Spread.ForgetRemoved", AccessTools.Method(typeof(MbEvent), "ClearListenerOfList"),
+                prefix: Patching.Own(self, nameof(ClearListenersPrefix)));
         }
 
         private static bool ResolveInternals()
@@ -115,6 +118,7 @@ namespace SteadyTicks.Spreading
             _discovered = false;
             Pending.Clear();
             Array.Clear(SplitLogged, 0, SplitLogged.Length);
+            Array.Clear(SpreadEvents, 0, SpreadEvents.Length);
         }
 
         /// <summary>Runs everything still queued, in order.</summary>
@@ -142,9 +146,6 @@ namespace SteadyTicks.Spreading
             var key = item.Action.Method;
             Costs[key] = Costs.TryGetValue(key, out double old) ? old + (ticks - old) * CostSmoothing : ticks;
         }
-
-        private static readonly string[] EventNames = { "hourly", "daily", "weekly" };
-        private static readonly string[] SpreadEventNames = { "hourly (spread)", "daily (spread)", "weekly (spread)" };
 
         private static int CurrentFrame => Campaign.Current?.CurrentTickCount ?? 0;
 
@@ -175,6 +176,7 @@ namespace SteadyTicks.Spreading
                 Kind.Daily => _daily!(events),
                 _ => _weekly!(events),
             };
+            SpreadEvents[(int)kind] = mbEvent;
 
             List<string>? modOwners = !spreading || SplitLogged[(int)kind] ? null : new List<string>();
             int spread = 0, onTheHour = 0;
@@ -188,7 +190,7 @@ namespace SteadyTicks.Spreading
                 object? owner = _ownerProperty!.GetValue(rec);
                 if (spreading && (IsBaseGame(owner) || ModSpreading.IsSpread(owner)))
                 {
-                    Pending.Enqueue(new Item(frame, action, owner?.GetType(), SpreadEventNames[(int)kind]));
+                    Pending.Enqueue(new Item(frame, action, rec));
                     spread++;
                 }
                 else
@@ -236,6 +238,38 @@ namespace SteadyTicks.Spreading
                         yield return (kind, owner);
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// The game's MbEvent.ClearListeners(owner) unlinks the first listener of that owner, so an event already running skips it.
+        /// Queued listeners were taken off the list earlier, so drop the same listener from the queue: it must not run after its
+        /// owner removed it (e.g. a mod's quest that just ended, whose state is already cleaned up).
+        /// </summary>
+        private static void ClearListenersPrefix(MbEvent __instance, object o)
+        {
+            // The game clears every event of an owner at once; only the three spread events can have queued listeners.
+            if (Pending.Count == 0 || _listField is null || Array.IndexOf(SpreadEvents, __instance) < 0)
+            {
+                return;
+            }
+
+            object? removed = _listField.GetValue(__instance);
+            while (removed is not null && _ownerProperty!.GetValue(removed) != o)
+            {
+                removed = _nextField!.GetValue(removed);
+            }
+
+            if (removed is null || !Pending.Any(item => ReferenceEquals(item.Record, removed)))
+            {
+                return;
+            }
+
+            var keep = Pending.Where(item => !ReferenceEquals(item.Record, removed)).ToList();
+            Pending.Clear();
+            foreach (var item in keep)
+            {
+                Pending.Enqueue(item);
             }
         }
 
