@@ -3,6 +3,8 @@
 ## 1.0.2
 
 - Spread ticks: when a mod object removes its hourly, daily or weekly listener (for example a quest that just ended), a copy already waiting in the queue no longer runs afterwards. The game skips removed listeners at once, and Steady Ticks now does the same.
+- Hero healing: a hero who moves to another clan while outside a party is now healed for exactly the hours since the last heal, instead of up to 4 hours too many or too few.
+- Profiler: listeners that their owners removed (ended quests, destroyed parties) are no longer kept in memory while the profiler is on.
 
 ## 1.0.1
 

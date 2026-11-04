@@ -52,6 +52,14 @@ namespace SteadyTicks.LessOften
                 prefix: change, postfix: changed);
             Patching.Apply(harmony, "LessOften.HeroHealing.Left", AccessTools.Method(typeof(PartyBase), "OnHeroRemoved", new[] { typeof(Hero), typeof(TroopRoster) }),
                 prefix: change, postfix: changed);
+
+            // A hero's clan (Hero.Clan is CompanionOf ?? the clan) changes through these two setters.
+            var clanChange = Patching.Own(typeof(HeroHealing), nameof(BeforeClanChange));
+            var clanChanged = Patching.Own(typeof(HeroHealing), nameof(AfterClanChange));
+            Patching.Apply(harmony, "LessOften.HeroHealing.Clan", AccessTools.PropertySetter(typeof(Hero), nameof(Hero.Clan)),
+                prefix: clanChange, postfix: clanChanged);
+            Patching.Apply(harmony, "LessOften.HeroHealing.CompanionOf", AccessTools.PropertySetter(typeof(Hero), nameof(Hero.CompanionOf)),
+                prefix: clanChange, postfix: clanChanged);
         }
 
         public static void Clear()
@@ -92,6 +100,24 @@ namespace SteadyTicks.LessOften
             {
                 account.Hours += now - account.Since;
             }
+        }
+
+        private static void BeforeClanChange(Hero __instance, out Clan? __state) => __state = __instance.Clan;
+
+        /// <summary>
+        /// A hero who moves to another clan outside a party was last healed at the old clan's last batch, not the new clan's.
+        /// Start tracking the hero from the old clan's last batch, so the new clan's next batch pays exactly the hours since then.
+        /// </summary>
+        private static void AfterClanChange(Hero __instance, Clan? __state)
+        {
+            if (__state is not { IsBanditFaction: false } oldClan || __instance.Clan == oldClan || !Settings.Current.HealHeroesEvery4Hours
+                || Campaign.Current is not { GameStarted: true } || Accounts.ContainsKey(__instance) || !IsOutside(__instance))
+            {
+                return;
+            }
+
+            double now = CampaignTime.Now.ToHours;
+            Accounts[__instance] = new Account { Since = now - CallsOf(oldClan) % Every };
         }
 
         private static bool Prefix(Clan clan, bool __runOriginal)

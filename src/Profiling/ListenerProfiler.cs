@@ -147,6 +147,7 @@ namespace SteadyTicks.Profiling
             try
             {
                 int added = 0;
+                var listed = new HashSet<object>(ReferenceEqualityComparer.Instance);
                 foreach (var field in typeof(CampaignEvents).GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
                 {
                     if (!IsMbEvent(field.FieldType) || field.GetValue(events) is not { } mbEvent)
@@ -163,6 +164,7 @@ namespace SteadyTicks.Profiling
                     string eventName = EventName(field.Name);
                     for (object? rec = access.List(mbEvent); rec is not null; rec = access.Next(rec))
                     {
+                        listed.Add(rec);
                         if (Wrapped.ContainsKey(rec))
                         {
                             continue;
@@ -187,9 +189,17 @@ namespace SteadyTicks.Profiling
                     }
                 }
 
-                if (added > 0)
+                // Forget listeners their owners removed (ended quests, destroyed parties), so those can be freed.
+                int forgotten = 0;
+                foreach (var rec in Wrapped.Keys.Where(rec => !listed.Contains(rec)).ToList())
                 {
-                    Log.Write($"Profiler: timing {added} more event listeners ({Wrapped.Count} in total)");
+                    Wrapped.Remove(rec);
+                    forgotten++;
+                }
+
+                if (added > 0 || forgotten > 0)
+                {
+                    Log.Write($"Profiler: timing {added} more event listeners, {forgotten} removed ones forgotten ({Wrapped.Count} in total)");
                 }
             }
             catch (Exception e)
