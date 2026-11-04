@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+
+- Spread ticks: when a mod object removes its hourly, daily or weekly listener (for example a quest that just ended), a copy already waiting in the queue no longer runs afterwards. The game skips removed listeners at once, and Steady Ticks now does the same.
+
 ## 1.0.1
 
 - Hero healing: a hero who joins or leaves a party between two 4-hour heals now gets exactly the hours spent outside a party, instead of all or nothing.

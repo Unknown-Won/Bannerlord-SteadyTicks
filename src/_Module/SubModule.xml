@@ -2,7 +2,7 @@
 <Module>
   <Name value="Steady Ticks"/>
   <Id value="SteadyTicks"/>
-  <Version value="v1.0.1"/>
+  <Version value="v1.0.2"/>
   <SingleplayerModule value="true"/>
   <MultiplayerModule value="false"/>
   <Official value="false"/>
