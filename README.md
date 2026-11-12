@@ -29,7 +29,7 @@ The charts are made from CapFrameX captures with `tools/charts` (see Building).
 
 ## Requirements
 
-- Bannerlord v1.4.8 (built and tested against it; War Sails / NavalDLC supported but not required)
+- Bannerlord v1.5.7 (built and checked against it; War Sails / NavalDLC supported but not required)
 - [Harmony](https://www.nexusmods.com/mountandblade2bannerlord/mods/2006) (Bannerlord.Harmony v2.4.2 or newer)
 - [Mod Configuration Menu (MCM) v5](https://www.nexusmods.com/mountandblade2bannerlord/mods/612) (v5.12 or newer)
 

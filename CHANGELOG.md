@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+- Built for Bannerlord v1.5.7. No changes in how the mod works.
+
 ## 1.0.2
 
 - Spread ticks: when a mod object removes its hourly, daily or weekly listener (for example a quest that just ended), a copy already waiting in the queue no longer runs afterwards. The game skips removed listeners at once, and Steady Ticks now does the same.
