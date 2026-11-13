@@ -7,7 +7,7 @@
 
 ## 1.0.3
 
-- Built for Bannerlord v1.5.7. No changes in how the mod works.
+- Built for Bannerlord v1.5.7, and still works on v1.4.8. No changes in how the mod works.
 
 ## 1.0.2
 
