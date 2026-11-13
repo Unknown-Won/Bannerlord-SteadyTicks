@@ -17,7 +17,7 @@ namespace SteadyTicks
         private const string Profiler = "Profiler";
 
         [SettingPropertyBool("Spread Hourly and Daily Ticks", Order = 0, RequireRestart = false,
-            HintText = "Runs the game's own hourly, daily and weekly tick work over the next frames instead of all in one frame. Other mods still run on the hour. [ Default: ON ]")]
+            HintText = "Runs the game's own hourly, daily and weekly tick work over the next frames instead of all in one frame. Other mods follow 'Spread Other Mods Too'. [ Default: ON ]")]
         [SettingPropertyGroup(Spread, GroupOrder = 0)]
         public bool SpreadTicks { get; set; } = true;
 

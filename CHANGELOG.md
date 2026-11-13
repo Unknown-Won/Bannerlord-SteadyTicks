@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.4
+
+- Slow Down Distant AI: parties that a quest is using are never slowed, even when the quest lets them make their own decisions.
+- Settings: the Spread Hourly and Daily Ticks hint no longer says other mods always run on the hour.
+
 ## 1.0.3
 
 - Built for Bannerlord v1.5.7. No changes in how the mod works.

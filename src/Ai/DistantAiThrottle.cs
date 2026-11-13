@@ -122,8 +122,9 @@ namespace SteadyTicks.Ai
                 return true;
             }
 
-            if (party.Army is not null || party.MapEvent is not null || party.SiegeEvent is not null || party.IsTransitionInProgress
-                || party.Ai.RethinkAtNextHourlyTick)
+            // Quest parties follow their quest's script; the quest relies on them reacting every hour.
+            if (party.IsCurrentlyUsedByAQuest || party.Army is not null || party.MapEvent is not null || party.SiegeEvent is not null
+                || party.IsTransitionInProgress || party.Ai.RethinkAtNextHourlyTick)
             {
                 return true;
             }
